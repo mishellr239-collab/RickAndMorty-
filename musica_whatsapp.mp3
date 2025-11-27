@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Rick and Morty Explorer 🌌</title>
+
+    <style>
+        /* Aquí van TODOS tus estilos CSS y @keyframes */
+        /* ... */
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-full text-white font-['Inter']">
+    
+    <audio id="sound-whatsapp" loop>
+        <source src="musica_whatsapp.mp3" type="audio/mpeg">
+    </audio>
+
+    <div class="background-particles" id="particles"></div>
+    
+    <script>
+        // 1. Obtener el elemento de audio (USANDO EL NUEVO ID)
+        // 1. Obtener el elemento de audio (USANDO EL NUEVO ID 'sound-whatsapp')
+const audio = document.getElementById('sound-whatsapp');
+
+// 2. Tu función startMusic (que usa 'audio.play()')
+function startMusic() {
+    // Definimos la variable 'overlay' que usa esta función
+    const overlay = document.getElementById('audioConsentOverlay'); 
+
+    audio.volume = 0.5; // Ajusta el volumen
+    
+    audio.play()
+        .then(() => {
+            // Si la reproducción tiene éxito, ocultar el overlay
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 500);
+        })
+        .catch(error => {
+            console.error('Error al intentar reproducir la música:', error);
+            // Ocultar si falla para no bloquear al usuario
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 500); 
+        });
+}
+
+// 3. El resto de tu JavaScript...
+// Aquí DEBE ir el resto de tu código JS para la API, filtros, y la inicialización de eventos.
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Aquí irían las llamadas a: 
+    // loadFavorites();
+    // createParticles();
+    // fetchCharacters();
+    // updateFavoritesUI();
+});
+        // 1. Obtener el elemnto del audio (USANDO EL NUEVO ID 'SOUND-WHATSAPP')
+        // 2. Tu función startMusic (que usa 'audio.play()')
+        function startMusic() {
+            // ... (el resto de tu función) ...
+        }
+
+        // 3. El resto de tu JavaScript...
+        // ...
+        // Bloque de Script JS
+    
+    </script>
+</body>
+</html>
