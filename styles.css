@@ -1,0 +1,206 @@
+@font-face {
+    font-family: "rick";
+    src: url('../assets/fuente/fuente.woff2') format('woff2'),
+         url('../assets/fuente/get_schwifty.ttf') format('truetype');
+
+}
+
+@font-face {
+    font-family: "batman";
+    src: url('../assets/fuente/batmfa__.ttf') format('truetype');
+}
+
+
+*{
+    margin: 0px;
+    padding: 0px;
+}
+
+#container{
+    width: 100%;
+    height: auto;
+    /*background-color: aqua;*/
+}
+
+main{
+    display: grid;
+    /*background-color: brown !important;*/
+    grid-template-columns: repeat(5, 1fr);
+    grid-template-rows: 100px 50px 2fr;
+}
+
+nav{
+    grid-column: 1 / 6;
+    grid-row: 1 / 2;
+    background-color: #40B5CB;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    margin-bottom: 15px;
+    margin-top: 15px;
+    border: 1px solid;
+    border-radius: 5px;
+    font-family: "rick", sans-serif;
+}
+
+section{
+    /*background-color: cadetblue;*/
+    grid-row: 3 / 4;
+    grid-column: 1 / 6;
+    /* grid */
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.personaje{
+    background-color: yellow;
+    padding: 5px;
+    width: 85%;
+    margin-left: 6%;
+    border: 1px solid;
+    border-radius: 5px;
+    box-shadow: 1px 1px 1px black;
+    margin-top: 60px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    transition: transform 0.4s ease,background-color 0.4s ease;
+}
+
+.personaje:hover{
+    transform: scale(1.1); 
+    background-color: #40B5CB !important;
+}
+
+.personaje .imgPersonaje {
+    border: 1px solid;
+    border-radius: 5px;
+    box-shadow: 0.5px 1px 1px black;
+    width: 89%;
+}
+
+
+#search{
+    grid-column: 1 / 6;
+    grid-row: 2 / 3;
+    background-color: #C0DF40;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    align-content: center;
+    padding-left: 20px;
+    border: 1px solid;
+    border-radius: 5px;
+    background-image: url(../assets/xgR8WP.jpg);
+    font-family: "batman", sans-serif;
+    font-size: 13px;
+}
+
+#imgTitulo{
+    height: 220px;
+    width: 40%;
+}
+
+/*header{
+    background-color: #40B5CB;
+}*/
+
+header h1 {
+    text-align: center;
+}
+
+body{
+    background-image: url('../assets/Rick-Morty-Dark-Phone-Wallpapers-Now-Download.jpg');
+    background-position: center;
+    background-repeat: repeat;
+    /*background-size: cover;*/
+    background-attachment: fixed;
+  }
+  
+input[type="text"]{
+    border: 1px solid !important;
+    border-radius: 5px !important;
+    width: 40%;
+    height: 25px;
+    background-color: #40B5CB;
+    padding-left: 5px;
+}
+
+.favNum{
+    display: flex;
+    align-items: center;
+    flex-direction: row-reverse;
+    width: 100%;
+    justify-content: space-between;
+    margin-bottom: 5px;
+}
+
+.favNum img{
+    transition: transform 0.4s ease;
+    cursor: pointer;
+}
+
+.favNum img:hover{
+    transform: scale(1.2); 
+}
+
+#info{
+    background-color: #40B5CB;
+    border-radius: 5px;
+    border: 1px solid;
+    padding-top: 4px;
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-right: 5px;
+    grid-column: 2 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#botonera{
+    grid-column: 2 / 3;
+    display: flex;
+    align-content: flex-start;
+    align-items: center;
+    justify-content: space-around;
+    
+}
+
+#imput{
+    grid-column: 1 / 2;
+}
+
+.colorStatus{
+    padding: 1px;
+    border: 1px solid;
+    border-radius: 5px;
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+a{
+    text-decoration: none;
+    font-size: xx-large;
+    color: #C0DF40;
+    transition: transform 0.4s ease;
+}
+
+a:hover{
+    transform: scale(1.1);
+}
+
+.noFav {
+    grid-column: 3 / 4;
+    text-align: center;
+    border: 1px solid black;
+    border-radius: 5px;
+    font-family: "rick", sans-serif;
+    color: #40B5CB;
+    padding: 5px;
+}
+
+.imgnofav {
+    width: 100%;
+    height: 380px;
+    border-radius: 5px;
+}
