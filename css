@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explorador interdimensional de personajes de Rick and Morty con diseño futurista">
+  <meta name="keywords" content="Rick and Morty, personajes, API, explorador, portal">
+  <meta name="author" content="Tu Nombre">
+  <title>🛸 Rick and Morty Explorer - Explorador Interdimensional</title>
+  
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg width='128' height='128' viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3CradialGradient id='portalGrad' cx='50%25' cy='50%25' r='50%25'%3E%3Cstop offset='0%25' style='stop-color:%2300ff9d;stop-opacity:1' /%3E%3Cstop offset='30%25' style='stop-color:%2300b8ff;stop-opacity:1' /%3E%3Cstop offset='60%25' style='stop-color:%23ff00ff;stop-opacity:1' /%3E%3Cstop offset='100%25' style='stop-color:%23001eff;stop-opacity:1' /%3E%3C/radialGradient%3E%3Cfilter id='glow'%3E%3CfeGaussianBlur stdDeviation='4' result='coloredBlur'/%3E%3CfeMerge%3E%3CfeMergeNode in='coloredBlur'/%3E%3CfeMergeNode in='SourceGraphic'/%3E%3C/feMerge%3E%3C/filter%3E%3C/defs%3E%3Ccircle cx='64' cy='64' r='60' fill='%230a0e27'/%3E%3Ccircle cx='64' cy='64' r='50' fill='url(%23portalGrad)' opacity='0.8' filter='url(%23glow)'/%3E%3Ccircle cx='64' cy='64' r='40' fill='none' stroke='%2300ff9d' stroke-width='2' opacity='0.6'/%3E%3Ccircle cx='64' cy='64' r='30' fill='none' stroke='%2300b8ff' stroke-width='2' opacity='0.6'/%3E%3Ccircle cx='64' cy='64' r='20' fill='none' stroke='%23ff00ff' stroke-width='2' opacity='0.6'/%3E%3Cellipse cx='64' cy='58' rx='22' ry='8' fill='%2300ff9d' filter='url(%23glow)'/%3E%3Cellipse cx='64' cy='54' rx='14' ry='10' fill='%2300b8ff'/%3E%3Ccircle cx='64' cy='50' r='6' fill='%23ff00ff'/%3E%3Ccircle cx='52' cy='60' r='2' fill='%23ffff00' opacity='0.9'/%3E%3Ccircle cx='64' cy='62' r='2' fill='%23ffff00' opacity='0.9'/%3E%3Ccircle cx='76' cy='60' r='2' fill='%23ffff00' opacity='0.9'/%3E%3Ccircle cx='25' cy='25' r='2' fill='%23ffffff' opacity='0.8'/%3E%3Ccircle cx='100' cy='30' r='1.5' fill='%23ffffff' opacity='0.7'/%3E%3Ccircle cx='105' cy='85' r='2' fill='%23ffffff' opacity='0.8'/%3E%3Ccircle cx='30' cy='95' r='1.5' fill='%23ffffff' opacity='0.7'/%3E%3Ccircle cx='90' cy='15' r='1' fill='%23ffffff' opacity='0.6'/%3E%3C/svg%3E"><script src="https://cdn.tailwindcss.com"></script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="css/styles.css">
+  
+  <script src="js/script.js" defer></script> 
+  
+  <style>@view-transition { navigation: auto; }</style>
+  
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 min-h-full text-white font-['Inter']">
+    
+    <div class="background-particles" id="particles"></div>
+    
+    <div class="relative z-10 min-h-full">
+        <header class="glass-effect py-8 px-4 sticky top-0 z-50 mb-8">
+            <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-4">
+                    <div class="portal-bg w-20 h-20 rounded-full float-animation flex items-center justify-center">
+                        <span class="text-4xl">🛸</span>
+                    </div>
+                    <div>
+                        <h1 class="text-4xl md:text-5xl font-black neon-text">Rick and Morty Explorer</h1>
+                        <p class="text-sm md:text-base text-gray-400 mt-1">🌌 Explora el multiverso de personajes 🌌</p>
+                    </div>
+                </div>
+                <div class="favorite-badge rounded-full px-6 py-3 flex items-center gap-2">
+                    <span class="text-2xl">⭐</span> 
+                    <span class="font-bold text-lg">Favoritos: <span id="favCount">0</span></span>
+                </div>
+            </div>
+            <div id="favoritesBar" class="max-w-7xl mx-auto mt-6 flex gap-3 overflow-x-auto pb-3 custom-scrollbar"></div>
+        </header>
+        
+        <main class="max-w-7xl mx-auto px-4 pb-12">
+            <section class="glass-effect rounded-2xl p-6 mb-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="searchInput" class="block text-sm font-semibold mb-2 gradient-text">🔍 Buscar por Nombre</label> 
+                        <input type="text" id="searchInput" placeholder="Escribe un nombre..." class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-lg text-white input-glow transition-all">
+                    </div>
+                    <div>
+                        <label for="statusFilter" class="block text-sm font-semibold mb-2 gradient-text">💚 Filtrar por Estado</label> 
+                        <select id="statusFilter" class="w-full px-4 py-3 bg-gray-800/50 border-2 border-gray-700 rounded-lg text-white input-glow transition-all cursor-pointer">
+                            <option value="">Todos los Estados</option>
+                            <option value="alive">Vivo 💚</option>
+                            <option value="dead">Muerto 💀</option>
+                            <option value="unknown">Desconocido ❓</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2">
+                    <div id="charactersGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-6"></div>
+                    
+                    <div id="loadingState" class="flex flex-col items-center justify-center py-20">
+                        <div class="loading-spinner mb-4"></div>
+                        <p class="text-xl font-semibold gradient-text">Cargando personajes del multiverso...</p>
+                    </div>
+                    
+                    <div id="emptyState" class="hidden flex-col items-center justify-center py-20 glass-effect rounded-2xl">
+                        <span class="text-8xl mb-4">🔍</span>
+                        <p class="text-2xl font-bold gradient-text">No se encontraron personajes</p>
+                        <p class="text-gray-400 mt-2">Intenta con otro nombre o filtro</p>
+                    </div>
+                </div>
+                
+                <div class="lg:col-span-1">
+                    <div id="detailsPanel" class="glass-effect rounded-2xl p-6 sticky top-28 max-h-[calc(100vh-8rem)] overflow-y-auto custom-scrollbar">
+                        <div class="flex flex-col items-center justify-center h-full text-center py-12">
+                            <span class="text-6xl mb-4">👆</span>
+                            <p class="text-xl font-semibold gradient-text">Selecciona un personaje</p>
+                            <p class="text-gray-400 mt-2 text-sm">Haz clic en cualquier tarjeta para ver detalles completos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <section class="mt-12 glass-effect rounded-2xl p-8">
+                <h2 class="text-3xl font-black gradient-text mb-6 text-center">📊 Estadísticas del Multiverso</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h3 class="text-xl font-bold text-cyan-400 mb-4">🧬 Por Especies</h3>
+                        <div id="speciesStats" class="space-y-3"></div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-purple-400 mb-4">🏷️ Por Tipos</h3>
+                        <div id="typesStats" class="space-y-3"></div>
+                    </div>
+                </div>
+            </section>
+        </main>
+        
+        <footer class="glass-effect py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 text-center">
+                <p class="text-gray-400">Creado con 💚 usando la 
+                    <a href="https://rickandmortyapi.com/" target="_blank" rel="noopener noreferrer" class="gradient-text font-semibold hover:underline"> Rick and Morty API </a>
+                </p>
+                <p class="text-gray-500 text-sm mt-2">🛸 Wubba Lubba Dub Dub! 🛸</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>
