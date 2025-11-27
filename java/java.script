@@ -1,0 +1,300 @@
+// Estado global
+let allCharacters = [];
+let nextUrl = 'https://rickandmortyapi.com/api/character'; // URL inicial
+let favorites = new Set();
+let isLoading = false; // Nuevo estado para evitar múltiples peticiones
+
+// Elementos del DOM
+const charactersGrid = document.getElementById('charactersGrid');
+const detailsPanel = document.getElementById('detailsPanel');
+const searchInput = document.getElementById('searchInput');
+const statusFilter = document.getElementById('statusFilter');
+const loadingState = document.getElementById('loadingState');
+const emptyState = document.getElementById('emptyState');
+const favCount = document.getElementById('favCount');
+const favoritesBar = document.getElementById('favoritesBar');
+
+// Generar partículas de fondo
+function createParticles() {
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 50; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'particle';
+        particle.style.left = Math.random() * 100 + '%';
+        particle.style.top = Math.random() * 100 + '%';
+        particle.style.animationDelay = Math.random() * 8 + 's';
+        particle.style.animationDuration = (Math.random() * 4 + 6) + 's';
+        particlesContainer.appendChild(particle);
+    }
+}
+
+// Obtener personajes desde la API con paginación
+async function fetchCharacters(url = nextUrl, append = false) {
+    if (isLoading || !url) return;
+    isLoading = true;
+
+    // Ocultar el botón "Cargar Más" y mostrar el estado de carga
+    const loadMoreButton = document.getElementById('loadMoreButton');
+    if (loadMoreButton) loadMoreButton.remove();
+    loadingState.classList.remove('hidden');
+    
+    // Limpiar la grilla solo si es la primera carga o una nueva búsqueda/filtro
+    if (!append) {
+         charactersGrid.innerHTML = '';
+    }
+
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        // Actualizar estados globales
+        nextUrl = data.info.next;
+        const newCharacters = data.results;
+        
+        // Agregar o reemplazar personajes
+        if (append) {
+            allCharacters = [...allCharacters, ...newCharacters];
+        } else {
+            allCharacters = newCharacters;
+        }
+        
+        // Mostrar los personajes filtrados (de todos los cargados)
+        displayCharacters(filterCharacters());
+        updateStatistics(allCharacters); // Estadísticas actualizadas con todos los personajes cargados
+
+        // Agregar botón "Cargar Más" si hay más páginas
+        if (nextUrl) {
+            appendLoadMoreButton();
+        }
+
+    } catch (error) {
+        console.error('Error al cargar personajes:', error);
+        charactersGrid.innerHTML = '<p class="text-red-400 text-center col-span-full">Error al cargar personajes. Por favor, recarga la página.</p>';
+    } finally {
+        loadingState.classList.add('hidden');
+        isLoading = false;
+    }
+}
+
+// Agregar botón de Cargar Más
+function appendLoadMoreButton() {
+    const button = document.createElement('button');
+    button.id = 'loadMoreButton';
+    button.textContent = 'Portal Abierto: Cargar Más Personajes 👽';
+    button.className = 'w-full mt-8 px-6 py-4 rounded-xl font-bold text-lg transition-all border-2 border-[#00ff9d] hover:border-[#ff00ff] glass-effect cursor-pointer';
+    button.style.backgroundImage = 'linear-gradient(45deg, rgba(0,255,157,0.1), rgba(0,184,255,0.1))';
+    button.onclick = () => fetchCharacters(nextUrl, true);
+
+    // Insertar el botón en el contenedor principal de la lista de personajes (lg:col-span-2)
+    const parent = charactersGrid.parentElement;
+    if (parent) {
+         // Eliminar cualquier botón anterior si existe
+        const existingButton = document.getElementById('loadMoreButton');
+        if (existingButton) existingButton.remove();
+
+        parent.appendChild(button);
+    }
+}
+
+// Mostrar personajes
+function displayCharacters(characters) {
+    charactersGrid.innerHTML = '';
+    
+    if (characters.length === 0 && (searchInput.value || statusFilter.value)) {
+        // Estado vacío después de un filtro/búsqueda
+        emptyState.classList.remove('hidden');
+        emptyState.classList.add('flex');
+        // Quitar el botón Cargar Más si el filtro no devuelve nada
+        const loadMoreButton = document.getElementById('loadMoreButton');
+        if (loadMoreButton) loadMoreButton.remove();
+        return;
+    }
+
+    emptyState.classList.add('hidden');
+
+    characters.forEach(character => {
+        const card = createCharacterCard(character);
+        charactersGrid.appendChild(card);
+    });
+}
+
+// Crear tarjeta de personaje
+function createCharacterCard(character) {
+    const card = document.createElement('div');
+    card.className = 'character-card glass-effect rounded-xl overflow-hidden cursor-pointer';
+                
+    const isFavorite = favorites.has(character.id);
+    const statusClass = character.status.toLowerCase() === 'alive' ? 'status-alive' :
+                        character.status.toLowerCase() === 'dead' ? 'status-dead' : 'status-unknown';
+
+    card.innerHTML = `
+        <div class="relative">
+            <img src="${character.image}" alt="${character.name}" class="w-full h-64 object-cover">
+            <button 
+                class="star-button absolute top-3 right-3 text-3xl"
+                onclick="toggleFavorite(event, ${character.id})"
+            >
+                ${isFavorite ? '⭐' : '☆'}
+            </button>
+            <div class="${statusClass} absolute bottom-3 left-3 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-2">
+                <span class="w-2 h-2 bg-white rounded-full"></span>
+                ${character.status}
+            </div>
+        </div>
+        <div class="p-4">
+            <h3 class="text-xl font-bold mb-2 gradient-text">${character.name}</h3>
+            <p class="text-gray-400 text-sm mb-1">🧬 ${character.species}</p>
+            <p class="text-gray-400 text-sm">⚧ ${character.gender}</p>
+        </div>
+    `;
+
+    card.addEventListener('click', (e) => {
+        if (!e.target.closest('.star-button')) {
+            showCharacterDetails(character);
+        }
+    });
+
+    return card;
+}
+
+// Mostrar detalles del personaje
+async function showCharacterDetails(character) {
+    detailsPanel.innerHTML = `
+        <div class="flex flex-col items-center">
+            <div class="loading-spinner mb-4"></div>
+            <p class="text-sm text-gray-400">Cargando detalles...</p>
+        </div>
+    `;
+
+    try {
+        const [originData, locationData, episodeData] = await Promise.all([
+            character.origin.url ? fetch(character.origin.url).then(r => r.json()) : Promise.resolve(null),
+            character.location.url ? fetch(character.location.url).then(r => r.json()) : Promise.resolve(null),
+            character.episode[0] ? fetch(character.episode[0]).then(r => r.json()) : Promise.resolve(null)
+        ]);
+
+        const statusClass = character.status.toLowerCase() === 'alive' ? 'status-alive' :
+                            character.status.toLowerCase() === 'dead' ? 'status-dead' : 'status-unknown';
+
+        detailsPanel.innerHTML = `
+            <div class="text-center">
+                <img src="${character.image}" alt="${character.name}" class="w-48 h-48 rounded-full mx-auto mb-4 pulse-glow border-4 border-cyan-400">
+                <h2 class="text-3xl font-black gradient-text mb-2">${character.name}</h2>
+                <div class="${statusClass} inline-block px-4 py-2 rounded-full text-sm font-bold mb-6">
+                    ${character.status}
+                </div>
+            </div>
+
+            <div class="space-y-4 mt-6">
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-cyan-400/30">
+                    <p class="text-cyan-400 font-semibold mb-1">🧬 Especie</p>
+                    <p class="text-white">${character.species}</p>
+                </div>
+
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-purple-400/30">
+                    <p class="text-purple-400 font-semibold mb-1">⚧ Género</p>
+                    <p class="text-white">${character.gender}</p>
+                </div>
+
+                ${character.type ? `
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-pink-400/30">
+                    <p class="text-pink-400 font-semibold mb-1">🏷️ Tipo</p>
+                    <p class="text-white">${character.type}</p>
+                </div>
+                ` : ''}
+
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-green-400/30">
+                    <p class="text-green-400 font-semibold mb-1">🌍 Origen</p>
+                    <p class="text-white">${character.origin.name}</p>
+                    ${originData && originData.type ? `<p class="text-gray-400 text-sm mt-1">Tipo: ${originData.type}</p>` : ''}
+                    ${originData && originData.dimension ? `<p class="text-gray-400 text-sm">Dimensión: ${originData.dimension}</p>` : ''}
+                </div>
+
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-blue-400/30">
+                    <p class="text-blue-400 font-semibold mb-1">📍 Ubicación Actual</p>
+                    <p class="text-white">${character.location.name}</p>
+                    ${locationData && locationData.type ? `<p class="text-gray-400 text-sm mt-1">Tipo: ${locationData.type}</p>` : ''}
+                </div>
+
+                ${episodeData ? `
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-yellow-400/30">
+                    <p class="text-yellow-400 font-semibold mb-1">📺 Primer Episodio</p>
+                    <p class="text-white">${episodeData.name}</p>
+                    <p class="text-gray-400 text-sm mt-1">${episodeData.episode} - ${episodeData.air_date}</p>
+                </div>
+                ` : ''}
+
+                <div class="detail-card bg-gray-800/30 p-4 rounded-lg border border-gray-400/30">
+                    <p class="text-gray-400 font-semibold mb-1">📅 Creado</p>
+                    <p class="text-white">${new Date(character.created).toLocaleDateString('es-ES')}</p>
+                </div>
+            </div>
+        `;
+    } catch (error) {
+        console.error('Error al cargar detalles:', error);
+        detailsPanel.innerHTML = '<p class="text-red-400 text-center">Error al cargar detalles</p>';
+    }
+}
+
+// Toggle favorito
+function toggleFavorite(event, characterId) {
+    event.stopPropagation();
+    
+    if (favorites.has(characterId)) {
+        favorites.delete(characterId);
+    } else {
+        favorites.add(characterId);
+    }
+    
+    updateFavoritesUI();
+    displayCharacters(filterCharacters());
+}
+
+// Actualizar UI de favoritos
+function updateFavoritesUI() {
+    favCount.textContent = favorites.size;
+    
+    favoritesBar.innerHTML = '';
+    
+    if (favorites.size === 0) {
+        favoritesBar.innerHTML = '<p class="text-gray-400 text-sm">No hay favoritos aún. Haz clic en la estrella (☆) de cualquier personaje.</p>';
+        return;
+    }
+
+    favorites.forEach(id => {
+        const character = allCharacters.find(c => c.id === id);
+        if (character) {
+            const badge = document.createElement('div');
+            badge.className = 'favorite-badge rounded-lg px-4 py-2 flex items-center gap-3 cursor-pointer flex-shrink-0';
+            badge.innerHTML = `
+                <img src="${character.image}" alt="${character.name}" class="w-10 h-10 rounded-full">
+                <span class="font-semibold">${character.name}</span>
+                <button onclick="toggleFavorite(event, ${character.id})" class="text-xl hover:scale-125 transition-transform">❌</button>
+            `;
+            badge.addEventListener('click', (e) => {
+                if (!e.target.closest('button')) {
+                    showCharacterDetails(character);
+                }
+            });
+            favoritesBar.appendChild(badge);
+        }
+    });
+}
+
+// Filtrar personajes
+function filterCharacters() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const statusValue = statusFilter.value.toLowerCase();
+
+    return allCharacters.filter(character => {
+        const matchesSearch = character.name.toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusValue || character.status.toLowerCase() === statusValue;
+        return matchesSearch && matchesStatus;
+    });
+}
+
+// Debounce para búsqueda
+let searchTimeout;
+searchInput.addEventListener('input', () => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
